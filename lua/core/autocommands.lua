@@ -1,10 +1,11 @@
+-- ~/.config/nvim/lua/core/autocommands.lua
+local autocmd = vim.api.nvim_create_autocmd
+
 vim.api.nvim_create_autocmd('UIEnter', {
   callback = function()
     vim.o.clipboard = 'unnamedplus'
   end,
 })
--- ~/.config/nvim/lua/core/autocommands.lua
-local autocmd = vim.api.nvim_create_autocmd
 
 -- Автоформатирование перед сохранением (если LSP поддерживает)
 autocmd('BufWritePre', {

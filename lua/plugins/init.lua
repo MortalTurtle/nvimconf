@@ -13,6 +13,85 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
   { 'nvim-treesitter/nvim-treesitter' },
+  -- Search
   { 'nvim-telescope/telescope.nvim' },
-  {"ellisonleao/gruvbox.nvim"},
+  -- interface & UX
+  {
+    'nvim-tree/nvim-web-devicons',
+    lazy = true,
+    config = function()
+      require('nvim-web-devicons').setup()
+    end,
+  },
+  { "nvim-tree/nvim-tree.lua", dependencies = { "nvim-tree/nvim-web-devicons" },},
+  {'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'},
+  {
+    'akinsho/toggleterm.nvim',
+    config = function()
+      require('toggleterm').setup()
+      vim.keymap.set('n', '<leader>t', ':ToggleTerm<CR>')
+    end
+  },
+  {
+    "folke/which-key.nvim", event = "VeryLazy",
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+    keys = {
+      {
+        "<leader>?",
+        function()
+          require("which-key").show({ global = false })
+        end,
+        desc = "Buffer Local Keymaps (which-key)",
+      },
+    },
+  },
+  { "windwp/nvim-autopairs", event = "InsertEnter", config = true },
+  --debug
+  {"mfussenegger/nvim-dap"},
+  {"rcarriga/nvim-dap-ui"},
+  {"theHamsta/nvim-dap-virtual-text"},
+  --lsp
+  { "neovim/nvim-lspconfig" },
+  --colorthemes
+  { 'projekt0n/github-nvim-theme', name = 'github-theme' },
+  { "ellisonleao/gruvbox.nvim" },
 })
+
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+
+require("nvim-tree").setup({
+  sort_by = "case_sensitive",
+  view = {
+    width = 30,
+  },
+  renderer = {
+    group_empty = true,
+  },
+  git = {
+    enable = true, -- подсветка изменений Git
+    ignore = false,
+  },
+})
+
+vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', { desc = 'Toggle file tree' })
+vim.keymap.set('n', '<C-r', ':NvimTreeRefresh<CR>', { desc = 'Refresh file tree' })
+vim.keymap.set('n', '<C-f>', ':NvimTreeFindFile<CR>', { desc = 'Find current file in tree' })
+
+--Автоматическое закрытие Neovim, если осталось только дерево:
+vim.api.nvim_create_autocmd("BufEnter", {
+  nested = true,
+  callback = function()
+    if #vim.api.nvim_list_wins() == 1 and vim.api.nvim_buf_get_name(0):match("NvimTree_") ~= nil then
+      vim.cmd "quit"
+    end
+  end
+})
+
+
+--require("bufferline").setup{}

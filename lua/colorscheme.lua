@@ -1,2 +1,1 @@
-vim.cmd('colorscheme gruvbox') -- Или другой theme (например, 'tokyonight')
-
+vim.cmd('colorscheme github_dark_dimmed')
