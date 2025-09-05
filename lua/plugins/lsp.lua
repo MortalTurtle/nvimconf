@@ -111,6 +111,20 @@ lsp.gopls.setup{
     },
 }
 
+lsp.clangd.setup(
+  {
+    cmd = {
+      "clangd",
+      "--background-index",
+      "--clang-tidy",
+      "--header-insertion=never",
+      "--all-scopes-completion",
+      "--cross-file-rename"
+    },
+    filetypes = { "c", "cpp", "objc", "objcpp" },
+  }
+)
+
 local null_ls = require("null-ls")
 
 null_ls.setup({

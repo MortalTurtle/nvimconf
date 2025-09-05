@@ -12,7 +12,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  { 'nvim-treesitter/nvim-treesitter' },
+  require("plugins.nvim-treesitter"),
   -- Search
   { 'nvim-telescope/telescope.nvim' },
   -- interface & UX
@@ -85,7 +85,28 @@ require('lazy').setup({
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       require('onedark').setup {
-        style = 'warmer'
+        style = 'warmer',
+        highlights = {
+          -- Общие элементы
+          Normal = { fg = '$fg', bg = '$bg0' },
+          ["@variable"] = { fg = '$fg' },
+          ["@function"] = { fg = '$blue', bold = false },
+          ["@method"] = { link = '@function' },
+          ["@string"] = { fg = '$green' },
+          ["@number"] = { fg = '$orange' },
+          ["@boolean"] = { fg = '$orange' },
+          ["@keyword"] = { fg = '$purple', italic = true },
+          ["@type"] = { fg = '$cyan' },
+          ["@constructor"] = { fg = '$cyan' },
+          ["@comment"] = { fg = '$grey', italic = true },
+          
+          -- Уменьшаем контраст дополнительных элементов
+          ["@property"] = { fg = '$cyan' },
+          ["@parameter"] = { fg = '$fg', italic = true },
+          ["@namespace"] = { fg = '$blue', italic = true },
+          ["@operator"] = { fg = '$fg' },
+          ["@constant"] = { fg = '$orange' },
+        }
       }
       -- Enable theme
       require('onedark').load()
@@ -131,3 +152,6 @@ require("plugins.lsp")
 vim.keymap.set('n', '<leader>y', require('osc52').copy_operator, { expr = true })
 vim.keymap.set('n', '<leader>yy', '<leader>y_', { remap = true })
 vim.keymap.set('v', '<leader>y', require('osc52').copy_visual)
+
+vim.g.skip_ts_context_commentstring_module = true
+

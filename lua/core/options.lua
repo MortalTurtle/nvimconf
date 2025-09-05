@@ -15,4 +15,4 @@ vim.o.scrolloff = 10
 vim.o.list = true
 vim.o.confirm = true
 --vim.opt.clipboard = 'unnamedplus'
-vim.opt.clipboard = 'unnamed'
+--vim.opt.clipboard = 'unnamed'
