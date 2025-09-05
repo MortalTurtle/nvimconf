@@ -17,6 +17,16 @@ require('lazy').setup({
   { 'nvim-telescope/telescope.nvim' },
   -- interface & UX
   {
+    'ojroques/nvim-osc52',
+    config = function()
+      require('osc52').setup({
+        -- Опциональные настройки:
+        silent = false,  -- Не показывать подтверждение копирования
+        trim = true,     -- Обрезать пробелы в начале/конце
+      })
+    end
+  },
+  {
     'nvim-tree/nvim-web-devicons',
     lazy = true,
     config = function()
@@ -117,3 +127,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
 
 require("plugins.lsp")
 --require("bufferline").setup{}
+
+vim.keymap.set('n', '<leader>y', require('osc52').copy_operator, { expr = true })
+vim.keymap.set('n', '<leader>yy', '<leader>y_', { remap = true })
+vim.keymap.set('v', '<leader>y', require('osc52').copy_visual)
