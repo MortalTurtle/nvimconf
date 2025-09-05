@@ -49,3 +49,14 @@ end, { desc = 'Print the git blame for the current line' })
 -- For example, to add the "nohlsearch" package to automatically turn off search highlighting after
 -- 'updatetime' and when going to insert mode
 vim.cmd('packadd! nohlsearch')
+-- Lua
+autocmd({ "CmdlineLeave" }, {
+  callback = function()
+    if vim.fn.getcmdtype() == "/" or vim.fn.getcmdtype() == "?" then
+      vim.schedule(function()
+        vim.cmd.nohlsearch() -- Отключает подсветку после завершения поиска
+      end)
+    end
+  end,
+})
+

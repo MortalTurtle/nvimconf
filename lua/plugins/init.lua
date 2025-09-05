@@ -64,9 +64,23 @@ require('lazy').setup({
   {"theHamsta/nvim-dap-virtual-text"},
   --lsp
   { "neovim/nvim-lspconfig" },
+  {
+    "nvimtools/none-ls.nvim",
+    events= "VeryLazy",
+  },
   --colorthemes
   { 'projekt0n/github-nvim-theme', name = 'github-theme' },
-  { "ellisonleao/gruvbox.nvim" },
+  {
+    "navarasu/onedark.nvim",
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('onedark').setup {
+        style = 'warmer'
+      }
+      -- Enable theme
+      require('onedark').load()
+    end
+  },
 })
 
 vim.g.loaded_netrw = 1
@@ -101,5 +115,5 @@ vim.api.nvim_create_autocmd("BufEnter", {
   end
 })
 
-
+require("plugins.lsp")
 --require("bufferline").setup{}

@@ -1,26 +1,130 @@
 local lsp = require('lspconfig')
 
-lsp.pyright.setup({})      -- Python
-vim.keymap.set('n', 'gd', vim.lsp.buf.definition) -- Переход к определению
-vim.keymap.set('n', 'K', vim.lsp.buf.hover)       -- Документация
+vim.diagnostic.config({
+  virtual_text = true,  -- Показывает ошибки в тексте
+  signs = true,         -- Значки на полях
+  update_in_insert = false,
+})
 
+-- Общая функция для keymaps
+local on_attach = function(client, bufnr)
+  -- Опции для буферных keymaps
+  local opts = { buffer = bufnr }
 
-vim.keymap.set('gD', vim.lsp.buf.declaration)
-vim.keymap.set('gd', vim.lsp.buf.definition)
-vim.keymap.set('K', vim.lsp.buf.hover)
-vim.keymap.set('gi', vim.lsp.buf.implementation)
-vim.keymap.set('<C-k>', vim.lsp.buf.signature_help)
-vim.keymap.set('<space>wa', vim.lsp.buf.add_workspace_folder)
-vim.keymap.set('<space>wr', vim.lsp.buf.remove_workspace_folder)
-vim.keymap.set('<space>wl', function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end)
-vim.keymap.set('<space>D', vim.lsp.buf.type_definition)
-vim.keymap.set('<space>rn', vim.lsp.buf.rename)
-vim.keymap.set('<space>ca', vim.lsp.buf.code_action)
-vim.keymap.set('gr', vim.lsp.buf.references)
-vim.keymap.set('<space>e', vim.diagnostic.open_float)
-vim.keymap.set('[d', vim.diagnostic.goto_prev)
-vim.keymap.set(']d', vim.diagnostic.goto_next)
-vim.keymap.set('<space>q', vim.diagnostic.setloclist)
-vim.keymap.set('<space>f', vim.lsp.buf.formatting)
-vim.keymap.set('<F12>', function() require('telescope.builtin').lsp_definitions() end)
-vim.keymap.set('<S-F12>', function() require('telescope.builtin').lsp_references({jump_type="never"}) end)
+  require('which-key').register({
+    ['<space>'] = {
+      e = { vim.diagnostic.open_float, "Show diagnostic" },
+      f = { "Format file" },
+      -- ... остальные хинты
+    },
+    g = {
+      D = { "Go to declaration" },
+      d = { "Go to definition" },
+      -- ... 
+    },
+  }, { buffer = bufnr })
+
+  -- Навигация
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+  vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+
+  -- Рабочее пространство
+  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+  vim.keymap.set('n', '<space>wl', function()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, opts)
+
+  -- Действия
+  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+  vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, opts)
+  vim.keymap.set('n', '<space>f', function()
+    vim.lsp.buf.format({ async = true })
+  end, opts)
+
+  -- Диагностика
+  vim.keymap.set('n', '<space>e', vim.diagnostic.open_float, opts)
+  vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+  vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+  vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
+
+  -- Telescope (если установлен)
+  pcall(function()
+    vim.keymap.set('n', '<F12>', function()
+      require('telescope.builtin').lsp_definitions()
+    end, opts)
+    vim.keymap.set('n', '<S-F12>', function()
+      require('telescope.builtin').lsp_references({ jump_type = "never" })
+    end, opts)
+  end)
+end
+
+lsp.gopls.setup{
+    cmd = {
+        "ya",
+        "tool",
+        "gopls",
+        "-rpc.trace",
+        "-logfile",
+        "/home/mortalturtle/.local/state/nvim/gopls.log",
+    },
+    settings = {
+        gopls = {
+          directoryFilters = {
+              "-",
+              "-library",
+              "+junk/mortalturtle",
+              "+xiva/core/gocommon",
+              "+xiva/private_api",
+              "+xiva/sms_relay",
+              "+library/go",
+          },
+          expandWorkspaceToModule = false,
+          analyses = {
+              unreachable = true,
+              unusedparams = true,
+              shadow = true,
+          },
+          staticcheck = true,
+          gofumpt = true,
+          completeUnimported = true,
+          usePlaceholders = true,
+          hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
+          }}
+    },
+    root_markers = {
+        "ya.make",
+        "go.work",
+        "go.mod",
+        ".git",
+    },
+}
+
+local null_ls = require("null-ls")
+
+null_ls.setup({
+  sources = {
+    -- Линтинг
+    null_ls.builtins.diagnostics.eslint,
+    null_ls.builtins.diagnostics.pylint,
+
+    -- Форматирование
+    null_ls.builtins.formatting.prettier,
+    null_ls.builtins.formatting.stylua, -- для Lua
+    null_ls.builtins.formatting.black,   -- для Python
+
+    -- Действия с кодом
+    null_ls.builtins.code_actions.gitsigns,
+  },
+})
