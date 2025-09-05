@@ -1,5 +1,24 @@
 local lsp = require('lspconfig')
 
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+capabilities.textDocument.completion.completionItem = {
+  snippetSupport = true,
+  preselectSupport = true,
+  insertReplaceSupport = true,
+  labelDetailsSupport = true,
+  deprecatedSupport = true,
+  commitCharactersSupport = true,
+  tagSupport = { valueSet = { 1 } },  -- Поддержка тегов (например, deprecated)
+  resolveSupport = {
+    properties = {
+      'documentation',
+      'detail',
+      'additionalTextEdits',
+    }
+  }
+}
+
 vim.diagnostic.config({
   virtual_text = true,  -- Показывает ошибки в тексте
   signs = true,         -- Значки на полях
@@ -73,6 +92,7 @@ lsp.gopls.setup{
         "-logfile",
         "/home/mortalturtle/.local/state/nvim/gopls.log",
     },
+    capabilities = capabilities,
     settings = {
         gopls = {
           directoryFilters = {
@@ -113,6 +133,7 @@ lsp.gopls.setup{
 
 lsp.clangd.setup(
   {
+    capabilities = capabilities,
     cmd = {
       "clangd",
       "--background-index",
