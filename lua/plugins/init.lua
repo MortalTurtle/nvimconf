@@ -110,6 +110,15 @@ require('lazy').setup({
     end,
   },
   --lsp
+  {
+    'echasnovski/mini.nvim',
+    config = function()
+      require('mini.trailspace').setup()
+      require('mini.misc').setup()       -- включает автоформатирование EOF
+      require('mini.comment').setup()
+      require('mini.surround').setup()
+    end
+  },
   { "neovim/nvim-lspconfig" },
   {
     "L3MON4D3/LuaSnip",

@@ -1,5 +1,5 @@
-vim.o.number = true
-vim.o.relativenumber = true
+vim.opt.number = true
+vim.opt.relativenumber = true
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.expandtab = true
@@ -14,5 +14,8 @@ vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.list = true
 vim.o.confirm = true
+-- Установка 'eol' (end-of-line) для всех буферов
+vim.bo.eol = true  -- Добавляет новую строку при сохранении
+vim.bo.fixendofline = true  -- Исправляет отсутствие EOF при сохранении
 --vim.opt.clipboard = 'unnamedplus'
 --vim.opt.clipboard = 'unnamed'
