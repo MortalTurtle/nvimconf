@@ -1,10 +1,10 @@
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-vim.opt.termguicolors = true
-vim.opt.mouse = 'a' 
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.termguicolors = true
+vim.o.mouse = 'a' 
 vim.g.mapleader = ' '
 vim.o.number = true
 vim.o.relativenumber = true

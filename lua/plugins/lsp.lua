@@ -19,6 +19,39 @@ capabilities.textDocument.completion.completionItem = {
   }
 }
 
+vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, {desc = "Rename symbol"})
+
+require('which-key').register({
+    ['<space>'] = {
+      e = { '<cmd>lua vim.diagnostic.open_float()<CR>', "Show diagnostic" },
+      f = { '<cmd>lua vim.lsp.buf.format({async=true})<CR>', "Format file" },
+      D = { '<cmd>lua vim.lsp.buf.type_definition()<CR>', "Type definition" },
+      q = { '<cmd>lua vim.diagnostic.setloclist()<CR>', "Diagnostics to loclist" },
+      w = {
+        name = "Workspace",
+        a = { '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', "Add folder" },
+        r = { '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', "Remove folder" },
+        l = { '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', "List folders" },
+      },
+      c = {
+        a = { '<cmd>lua vim.lsp.buf.code_action()<CR>', "Code action" },
+      },
+    },
+    g = {
+      name = "Go to",
+      D = { '<cmd>lua vim.lsp.buf.declaration()<CR>', "Declaration" },
+      d = { '<cmd>lua vim.lsp.buf.definition()<CR>', "Definition" },
+      i = { '<cmd>lua vim.lsp.buf.implementation()<CR>', "Implementation" },
+      r = { '<cmd>lua vim.lsp.buf.references()<CR>', "References" },
+    },
+    ['['] = {
+      d = { '<cmd>lua vim.diagnostic.goto_prev()<CR>', "Prev diagnostic" },
+    },
+    [']'] = {
+      d = { '<cmd>lua vim.diagnostic.goto_next()<CR>', "Next diagnostic" },
+    },
+  }, { buffer = bufnr })
+
 vim.diagnostic.config({
   virtual_text = true,  -- Показывает ошибки в тексте
   signs = true,         -- Значки на полях
@@ -30,19 +63,7 @@ local on_attach = function(client, bufnr)
   -- Опции для буферных keymaps
   local opts = { buffer = bufnr }
 
-  require('which-key').register({
-    ['<space>'] = {
-      e = { vim.diagnostic.open_float, "Show diagnostic" },
-      f = { "Format file" },
-      -- ... остальные хинты
-    },
-    g = {
-      D = { "Go to declaration" },
-      d = { "Go to definition" },
-      -- ... 
-    },
-  }, { buffer = bufnr })
-
+  -- Сначала регистрируем все LSP keymaps
   -- Навигация
   vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
   vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
@@ -60,7 +81,6 @@ local on_attach = function(client, bufnr)
   end, opts)
 
   -- Действия
-  vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, opts)
   vim.keymap.set('n', '<space>f', function()
     vim.lsp.buf.format({ async = true })
@@ -82,6 +102,7 @@ local on_attach = function(client, bufnr)
     end, opts)
   end)
 end
+
 
 lsp.gopls.setup{
     cmd = {

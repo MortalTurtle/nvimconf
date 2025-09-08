@@ -44,6 +44,10 @@ require('lazy').setup({
   { 'nvim-telescope/telescope.nvim' },
   -- interface & UX
   {
+    'NMAC427/guess-indent.nvim',
+    config = function() require('guess-indent').setup {} end
+  },
+  {
     'ojroques/nvim-osc52',
     config = function()
       require('osc52').setup({
@@ -88,9 +92,23 @@ require('lazy').setup({
   },
   { "windwp/nvim-autopairs", event = "InsertEnter", config = true },
   --debug
-  {"mfussenegger/nvim-dap"},
-  {"rcarriga/nvim-dap-ui"},
-  {"theHamsta/nvim-dap-virtual-text"},
+  {
+    'mfussenegger/nvim-dap',
+    dependencies = {
+      'rcarriga/nvim-dap-ui',
+      'nvim-neotest/nvim-nio',
+      'theHamsta/nvim-dap-virtual-text',
+    },
+    config = function()
+      require('dapui').setup()
+    end
+  },
+  {
+    "leoluz/nvim-dap-go",
+    config = function()
+      require("dap-go").setup()
+    end,
+  },
   --lsp
   { "neovim/nvim-lspconfig" },
   {
@@ -196,7 +214,9 @@ vim.g.loaded_netrwPlugin = 1
 require("nvim-tree").setup({
   sort_by = "case_sensitive",
   view = {
+    adaptive_size = false,
     width = 30,
+    preserve_window_proportions = false, 
   },
   renderer = {
     group_empty = true,
@@ -205,6 +225,8 @@ require("nvim-tree").setup({
     enable = true, -- подсветка изменений Git
     ignore = false,
   },
+  hijack_cursor = false,
+  respect_buf_cwd = true,
 })
 
 vim.keymap.set('n', '<C-n>', ':NvimTreeToggle<CR>', { desc = 'Toggle file tree' })
@@ -222,6 +244,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
 })
 
 require("plugins.lsp")
+require("plugins.dap")
 --require("bufferline").setup{}
 
 vim.keymap.set('n', '<leader>y', require('osc52').copy_operator, { expr = true })
