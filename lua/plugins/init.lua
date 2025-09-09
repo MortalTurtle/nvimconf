@@ -116,7 +116,13 @@ require('lazy').setup({
       require('mini.trailspace').setup()
       require('mini.misc').setup()       -- включает автоформатирование EOF
       require('mini.comment').setup()
-      require('mini.surround').setup()
+      require("mini.surround").setup({
+        mappings = {
+          add = "gsa",    -- Добавить окружение (в визуальном режиме)
+          delete = "gsd", -- Удалить окружение
+          replace = "gsr", -- Заменить окружение
+        },
+      })
     end
   },
   { "neovim/nvim-lspconfig" },
