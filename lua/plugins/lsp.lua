@@ -19,10 +19,24 @@ capabilities.textDocument.completion.completionItem = {
   }
 }
 
-vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, {desc = "Rename symbol"})
+vim.keymap.set('n', 'tgd', function()
+  require('telescope.builtin').lsp_definitions()
+end, { desc = '[T]elescope [G]oto [D]efinition' })
+
+vim.keymap.set('n', 'tgr', function()
+  require('telescope.builtin').lsp_references({ jump_type = "never" })
+end, { desc = '[T]elescope [G]oto [R]eferences' })
+
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, {desc = "Rename symbol"})
 
 require('which-key').register({
     ['<space>'] = {
+      d = {name="Dapui"},
+      g = {
+        name = "Go to",
+        d = { function() require('telescope.builtin').lsp_definitions() end, "Go to Definition" },
+        r = { function() require('telescope.builtin').lsp_references({ jump_type = "never" }) end, "Go to References" }
+      }
       e = { '<cmd>lua vim.diagnostic.open_float()<CR>', "Show diagnostic" },
       f = { '<cmd>lua vim.lsp.buf.format({async=true})<CR>', "Format file" },
       D = { '<cmd>lua vim.lsp.buf.type_definition()<CR>', "Type definition" },
@@ -35,6 +49,9 @@ require('which-key').register({
       },
       c = {
         a = { '<cmd>lua vim.lsp.buf.code_action()<CR>', "Code action" },
+      },
+      r = {
+        n = { vim.lsp.buf.rename, "Rename symbol" }
       },
     },
     g = {
@@ -91,16 +108,6 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
   vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
   vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist, opts)
-
-  -- Telescope (если установлен)
-  pcall(function()
-    vim.keymap.set('n', '<F12>', function()
-      require('telescope.builtin').lsp_definitions()
-    end, opts)
-    vim.keymap.set('n', '<S-F12>', function()
-      require('telescope.builtin').lsp_references({ jump_type = "never" })
-    end, opts)
-  end)
 end
 
 
