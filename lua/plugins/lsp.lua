@@ -36,7 +36,7 @@ require('which-key').register({
         name = "Go to",
         d = { function() require('telescope.builtin').lsp_definitions() end, "Go to Definition" },
         r = { function() require('telescope.builtin').lsp_references({ jump_type = "never" }) end, "Go to References" }
-      }
+      },
       e = { '<cmd>lua vim.diagnostic.open_float()<CR>', "Show diagnostic" },
       f = { '<cmd>lua vim.lsp.buf.format({async=true})<CR>', "Format file" },
       D = { '<cmd>lua vim.lsp.buf.type_definition()<CR>', "Type definition" },
@@ -130,6 +130,7 @@ lsp.gopls.setup{
               "+xiva/core/gocommon",
               "+xiva/private_api",
               "+xiva/sms_relay",
+              "+xiva/sms_feedback",
               "+library/go",
           },
           expandWorkspaceToModule = false,

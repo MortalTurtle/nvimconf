@@ -260,7 +260,56 @@ vim.api.nvim_create_autocmd("BufEnter", {
 
 require("plugins.lsp")
 require("plugins.dap")
---require("bufferline").setup{}
+require("bufferline").setup({
+  options = {
+    mode = "buffers", -- или "tabs" (режим вкладок вместо буферов)
+    numbers = "none", -- "none" | "ordinal" | "buffer_id" | "both"
+    close_command = "bdelete! %d", -- команда для закрытия буфера
+    right_mouse_command = "bdelete! %d", -- действие по ПКМ
+    left_mouse_command = "buffer %d", -- действие по ЛКМ
+    middle_mouse_command = nil, -- действие по СКМ
+    indicator = {
+      icon = "▎", -- индикатор текущего буфера
+      style = "underline", -- или "icon" | "none"
+    },
+    modified_icon = "●", -- иконка изменённого буфера
+    left_trunc_marker = "", -- маркер обрезанного списка слева
+    right_trunc_marker = "", -- маркер обрезанного списка справа
+    name_formatter = function(buf) -- форматирование имени буфера
+      return buf.name
+    end,
+    max_name_length = 18, -- макс. длина имени буфера
+    max_prefix_length = 15, -- макс. длина префикса (для уникальных имён)
+    truncate_names = true, -- обрезать длинные имена
+    tab_size = 18, -- ширина вкладки
+    diagnostics = "nvim_lsp", -- источник диагностики ("nvim_lsp" | "coc")
+    diagnostics_update_in_insert = false, -- обновлять диагностику в режиме вставки
+    offsets = { -- смещения для других элементов (например, NvimTree)
+      {
+        filetype = "NvimTree",
+        text = "File Explorer",
+        highlight = "Directory",
+        text_align = "left",
+      },
+    },
+    color_icons = true, -- раскрашивать иконки
+    show_buffer_icons = true, -- показывать иконки буферов
+    show_buffer_close_icons = true, -- показывать иконки закрытия
+    show_close_icon = true, -- показывать иконку закрытия всей панели
+    show_tab_indicators = true, -- показывать индикаторы вкладок
+    persist_buffer_sort = true, -- сохранять сортировку буферов
+    separator_style = "thick", -- "slant" | "slope" | "thick" | "thin" | { "any", "any" }
+    enforce_regular_tabs = false, -- выравнивать вкладки по размеру
+    always_show_bufferline = true, -- всегда показывать bufferline
+  },
+})
+vim.keymap.set("n", "<Tab>", "<Cmd>BufferLineCycleNext<CR>", { desc = "Следующий буфер" })
+vim.keymap.set("n", "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", { desc = "Предыдущий буфер" })
+vim.keymap.set("n", "<leader>bp", "<Cmd>BufferLinePick<CR>", { desc = "Выбрать буфер" })
+vim.keymap.set("n", "<leader>bc", "<Cmd>BufferLinePickClose<CR>", { desc = "Закрыть выбранный буфер" })
+vim.keymap.set("n", "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>", { desc = "Закрыть буферы слева" })
+vim.keymap.set("n", "<leader>br", "<Cmd>BufferLineCloseRight<CR>", { desc = "Закрыть буферы справа" })
+
 
 vim.keymap.set('n', '<leader>y', require('osc52').copy_operator, { expr = true })
 vim.keymap.set('n', '<leader>yy', '<leader>y_', { remap = true })
