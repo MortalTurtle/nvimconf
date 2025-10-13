@@ -5,7 +5,7 @@ vim.keymap.set('n', '<F5>', dap.continue, {desc = "Continue"})
 vim.keymap.set('n', '<F10>', dap.step_over, {desc = "Step over"})
 vim.keymap.set('n', '<F11>', dap.step_into, {desc = "Step into"})
 vim.keymap.set('n', '<F12>', dap.step_out, {desc = "Steb out"})
-vim.keymap.set('n', '<leader>bp', dap.toggle_breakpoint, {desc = "Breakpoint"})
+vim.keymap.set('n', '<leader>bb', dap.toggle_breakpoint, {desc = "Breakpoint"})
 vim.keymap.set('n', '<leader>B', function() 
   dap.set_breakpoint(vim.fn.input('Breakpoint condition: ')) 
 end,
