@@ -160,6 +160,33 @@ lsp.gopls.setup{
     },
 }
 
+lsp.pylsp.setup({
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = {
+        pylsp = {
+            plugins = {
+                pycodestyle = {
+                    enabled = true,
+                    maxLineLength = 120,
+                },
+                pylint = {
+                    enabled = true,
+                },
+                autopep8 = {
+                    enabled = false,  -- если используете black
+                },
+                black = {
+                    enabled = true,
+                    line_length = 120,
+                },
+                mypy = { enabled = true },
+            },
+        },
+    },
+})
+
+
 lsp.clangd.setup(
   {
     capabilities = capabilities,

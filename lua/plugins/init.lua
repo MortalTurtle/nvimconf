@@ -31,6 +31,12 @@ require('lazy').setup({
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       require("lualine").setup({
+        sections = {
+          lualine_c = {
+            { 'filename', path = 1 }  -- 1 = относительный путь, 2 = абсолютный, 3 = только имя
+          },
+          lualine_x = {'encoding', 'filetype'},
+        },
         options = {
           theme = "auto",
           icons_enabled = true,
