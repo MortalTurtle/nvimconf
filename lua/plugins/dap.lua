@@ -6,8 +6,8 @@ vim.keymap.set('n', '<F10>', dap.step_over, {desc = "Step over"})
 vim.keymap.set('n', '<F11>', dap.step_into, {desc = "Step into"})
 vim.keymap.set('n', '<F12>', dap.step_out, {desc = "Steb out"})
 vim.keymap.set('n', '<leader>bb', dap.toggle_breakpoint, {desc = "Breakpoint"})
-vim.keymap.set('n', '<leader>B', function() 
-  dap.set_breakpoint(vim.fn.input('Breakpoint condition: ')) 
+vim.keymap.set('n', '<leader>B', function()
+  dap.set_breakpoint(vim.fn.input('Breakpoint condition: '))
 end,
 {desc = "Conditional breakpoint"})
 
@@ -35,13 +35,13 @@ dap.adapters.delve = {
 dap.configurations.go = {
   {
     type = "delve",
-    name = "Debug",
+    name = "Debug (delve)",
     request = "launch",
     program = "${file}",
   },
   {
     type = "delve",
-    name = "Debug with args",
+    name = "Debug with args (delve)",
     request = "launch",
     program = "${file}",
     args = function()
@@ -50,15 +50,52 @@ dap.configurations.go = {
   },
   {
     type = "delve",
-    name = "Debug test",
+    name = "Debug test (delve)",
     request = "launch",
     mode = "test",
     program = "${file}",
   },
   {
     type = "delve",
-    name = "Debug package",
+    name = "Debug package (delve)",
     request = "launch",
     program = "./${relativeFileDirname}",
+  },
+}
+
+dap.adapters.lldb = {
+  type = 'executable',
+  command = 'lldb-dap',
+  name = 'lldb'
+}
+
+
+-- Конфигурации отладки для C++
+dap.configurations.cpp = {
+  {
+    name = 'Launch (lldb)',
+    type = 'lldb',
+    request = 'launch',
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopOnEntry = false,
+    args = {},
+    runInTerminal = false,
+    setupCommands = {
+      {
+        text = '-enable-pretty-printing',
+        description = 'enable pretty printing',
+        ignoreFailures = false
+      },
+    },
+  },
+  {
+    name = 'Attach to process (lldb)',
+    type = 'lldb',
+    request = 'attach',
+    pid = require('dap.utils').pick_process,
+    args = {},
   },
 }

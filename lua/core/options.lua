@@ -4,7 +4,7 @@ vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.expandtab = true
 vim.o.termguicolors = true
-vim.o.mouse = 'a' 
+vim.o.mouse = 'a'
 vim.g.mapleader = ' '
 vim.o.number = true
 vim.o.relativenumber = true
@@ -17,5 +17,5 @@ vim.o.confirm = true
 -- Установка 'eol' (end-of-line) для всех буферов
 vim.bo.eol = true  -- Добавляет новую строку при сохранении
 vim.bo.fixendofline = true  -- Исправляет отсутствие EOF при сохранении
---vim.opt.clipboard = 'unnamedplus'
---vim.opt.clipboard = 'unnamed'
+vim.opt.clipboard = 'unnamedplus' -- linux
+--vim.opt.clipboard = 'unnamed' -- macos

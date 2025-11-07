@@ -186,21 +186,66 @@ lsp.pylsp.setup({
     },
 })
 
+lsp.clangd.setup({
+  capabilities = capabilities,
+  on_attach = on_attach,  -- убедимся, что используем общую on_attach
+  cmd = {
+    "clangd",
+    "--background-index",
+    "--clang-tidy",
+    "--header-insertion=never",
+    "--completion-style=detailed",  -- более детальное автодополнение
+    "--all-scopes-completion",
+    "--cross-file-rename",
+  },
+  filetypes = { "c", "cc", "cpp", "objc", "objcpp", "cuda" },
+})
 
-lsp.clangd.setup(
-  {
-    capabilities = capabilities,
-    cmd = {
-      "clangd",
-      "--background-index",
-      "--clang-tidy",
-      "--header-insertion=never",
-      "--all-scopes-completion",
-      "--cross-file-rename"
+-- LSP сервер для YAML
+lsp.yamlls.setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+  settings = {
+    yaml = {
+      schemas = {
+        kubernetes = "/*.yaml",
+        ["http://json.schemastore.org/github-workflow"] = ".github/workflows/*",
+        ["http://json.schemastore.org/github-action"] = ".github/action.yml",
+        ["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/*.yml",
+        ["http://json.schemastore.org/prettierrc"] = ".prettierrc.yaml",
+        ["http://json.schemastore.org/kustomization"] = "kustomization.yaml",
+        ["http://json.schemastore.org/helmfile"] = "helmfile.yaml",
+        ["http://json.schemastore.org/chart"] = "Chart.yaml",
+      },
+      schemaStore = {
+        enable = true,
+        url = "https://www.schemastore.org/api/json/catalog.json",
+      },
+      format = {
+        enable = true,
+      },
+      validate = true,
+      completion = true,
+      hover = true,
     },
-    filetypes = { "c", "cpp", "objc", "objcpp" },
-  }
-)
+  },
+  filetypes = { "yaml", "yml" },
+})
+
+-- LSP сервер для JSON
+lsp.jsonls.setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+  settings = {
+    json = {
+      schemas = require('schemastore').json.schemas(),
+      validate = { enable = true },
+      format = { enable = true },
+    },
+  },
+  filetypes = { "json", "jsonc" },
+})
+
 
 local null_ls = require("null-ls")
 
@@ -217,5 +262,27 @@ null_ls.setup({
 
     -- Действия с кодом
     null_ls.builtins.code_actions.gitsigns,
+
+     -- C++: форматирование с помощью clang-format
+    null_ls.builtins.formatting.clang_format,
+
+    -- SQL: линтинг и форматирование
+    null_ls.builtins.diagnostics.sqlfluff,
+    null_ls.builtins.formatting.sqlfluff,
+
+     -- Новые для YAML
+    null_ls.builtins.formatting.yamlfmt.with({
+      extra_args = { "--formatter", "yaml" },
+    }),
+    null_ls.builtins.formatting.prettier.with({
+      filetypes = { "yaml", "yml" },
+    }),
+    -- Новые для JSON
+    null_ls.builtins.diagnostics.jsonlint,
+    null_ls.builtins.formatting.jq,
+    null_ls.builtins.formatting.prettier.with({
+      filetypes = { "json", "jsonc" },
+    }),
   },
 })
+
