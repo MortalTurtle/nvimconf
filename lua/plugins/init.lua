@@ -64,7 +64,7 @@ require("lazy").setup({
 		"jay-babu/mason-null-ls.nvim",
 		dependencies = {
 			"williamboman/mason.nvim",
-			"jose-elias-alvarez/null-ls.nvim",
+			"nvimtools/none-ls.nvim",
 		},
 		config = function()
 			require("mason-null-ls").setup({
@@ -103,6 +103,20 @@ require("lazy").setup({
 		"b0o/SchemaStore.nvim",
 		lazy = true,
 	},
+	-- Search - ДОБАВЛЕН Telescope И ЕГО ЗАВИСИМОСТИ
+	{
+		"nvim-telescope/telescope.nvim",
+		tag = "0.1.5",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-treesitter/nvim-treesitter",
+		}
+	},
+	-- LSP completion - ДОБАВЛЕН cmp_nvim_lsp
+	{
+		"hrsh7th/cmp-nvim-lsp",
+		dependencies = "hrsh7th/nvim-cmp"
+	},
 	-- Статусная строка
 	{
 		"nvim-lualine/lualine.nvim",
@@ -124,8 +138,6 @@ require("lazy").setup({
 			})
 		end,
 	},
-	-- Search
-	{ "nvim-telescope/telescope.nvim" },
 	-- interface & UX
 	{
 		"NMAC427/guess-indent.nvim",
@@ -181,7 +193,7 @@ require("lazy").setup({
 			},
 		},
 	},
-	{ "windwp/nvim-autopairs", event = "InsertEnter", config = true },
+	{ "windwp/nvim-autopairs",   event = "InsertEnter",                           config = true },
 	--debug
 	{
 		"mfussenegger/nvim-dap",
@@ -280,8 +292,8 @@ require("lazy").setup({
 					{ name = "buffer" },
 					{ name = "path" },
 					{ name = "nvim_lua" }, -- Для Lua API Neovim
-					{ name = "calc" }, -- Математические вычисления
-					{ name = "emoji" }, -- Подсказки emoji
+					{ name = "calc" },   -- Математические вычисления
+					{ name = "emoji" },  -- Подсказки emoji
 					{ name = "treesitter" }, -- Использование treesitter
 					{ name = "vim-dadbod-completion" }, -- Для SQL
 				}),
@@ -293,7 +305,11 @@ require("lazy").setup({
 	},
 	{
 		"nvimtools/none-ls.nvim",
-		events = "VeryLazy",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+		},
+		config = function()
+		end,
 	},
 	--colorthemes
 	{
@@ -372,13 +388,13 @@ require("bufferline").setup({
 		name_formatter = function(buf) -- форматирование имени буфера
 			return buf.name
 		end,
-		max_name_length = 18, -- макс. длина имени буфера
-		max_prefix_length = 15, -- макс. длина префикса (для уникальных имён)
-		truncate_names = true, -- обрезать длинные имена
-		tab_size = 18, -- ширина вкладки
-		diagnostics = "nvim_lsp", -- источник диагностики ("nvim_lsp" | "coc")
+		max_name_length = 18,           -- макс. длина имени буфера
+		max_prefix_length = 15,         -- макс. длина префикса (для уникальных имён)
+		truncate_names = true,          -- обрезать длинные имена
+		tab_size = 18,                  -- ширина вкладки
+		diagnostics = "nvim_lsp",       -- источник диагностики ("nvim_lsp" | "coc")
 		diagnostics_update_in_insert = false, -- обновлять диагностику в режиме вставки
-		offsets = { -- смещения для других элементов (например, NvimTree)
+		offsets = {                     -- смещения для других элементов (например, NvimTree)
 			{
 				filetype = "NvimTree",
 				text = "File Explorer",
@@ -386,10 +402,10 @@ require("bufferline").setup({
 				text_align = "left",
 			},
 		},
-		color_icons = true, -- раскрашивать иконки
+		color_icons = true,       -- раскрашивать иконки
 		show_buffer_icons = true, -- показывать иконки буферов
 		show_buffer_close_icons = true, -- показывать иконки закрытия
-		show_close_icon = true, -- показывать иконку закрытия всей панели
+		show_close_icon = true,   -- показывать иконку закрытия всей панели
 		show_tab_indicators = true, -- показывать индикаторы вкладок
 		persist_buffer_sort = true, -- сохранять сортировку буферов
 		separator_style = "thick", -- "slant" | "slope" | "thick" | "thin" | { "any", "any" }
