@@ -1,6 +1,6 @@
 -- ~/.config/nvim/lua/plugins/lsp.lua
-local lsp = require("lspconfig")
-local has_esp32, esp32 = pcall(require, "esp32")
+-- Используем нативный vim.lsp.config API (Neovim 0.12+)
+
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 capabilities.textDocument.completion.completionItem = {
@@ -10,7 +10,7 @@ capabilities.textDocument.completion.completionItem = {
 	labelDetailsSupport = true,
 	deprecatedSupport = true,
 	commitCharactersSupport = true,
-	tagSupport = { valueSet = { 1 } }, -- Поддержка тегов (например, deprecated)
+	tagSupport = { valueSet = { 1 } },
 	resolveSupport = {
 		properties = {
 			"documentation",
@@ -20,78 +20,10 @@ capabilities.textDocument.completion.completionItem = {
 	},
 }
 
-vim.keymap.set("n", "tgd", function()
-	require("telescope.builtin").lsp_definitions()
-end, { desc = "[T]elescope [G]oto [D]efinition" })
-
-vim.keymap.set("n", "tgr", function()
-	require("telescope.builtin").lsp_references({ jump_type = "never" })
-end, { desc = "[T]elescope [G]oto [R]eferences" })
-
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
-
-require("which-key").register({
-	["<space>"] = {
-		d = { name = "Dapui" },
-		g = {
-			name = "Go to",
-			d = {
-				function()
-					require("telescope.builtin").lsp_definitions()
-				end,
-				"Go to Definition",
-			},
-			r = {
-				function()
-					require("telescope.builtin").lsp_references({ jump_type = "never" })
-				end,
-				"Go to References",
-			},
-		},
-		e = { "<cmd>lua vim.diagnostic.open_float()<CR>", "Show diagnostic" },
-		f = { "<cmd>lua vim.lsp.buf.format({async=true})<CR>", "Format file" },
-		D = { "<cmd>lua vim.lsp.buf.type_definition()<CR>", "Type definition" },
-		q = { "<cmd>lua vim.diagnostic.setloclist()<CR>", "Diagnostics to loclist" },
-		w = {
-			name = "Workspace",
-			a = { "<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>", "Add folder" },
-			r = { "<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>", "Remove folder" },
-			l = { "<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>", "List folders" },
-		},
-		c = {
-			a = { "<cmd>lua vim.lsp.buf.code_action()<CR>", "Code action" },
-		},
-		r = {
-			n = { vim.lsp.buf.rename, "Rename symbol" },
-		},
-	},
-	g = {
-		name = "Go to",
-		D = { "<cmd>lua vim.lsp.buf.declaration()<CR>", "Declaration" },
-		d = { "<cmd>lua vim.lsp.buf.definition()<CR>", "Definition" },
-		i = { "<cmd>lua vim.lsp.buf.implementation()<CR>", "Implementation" },
-		r = { "<cmd>lua vim.lsp.buf.references()<CR>", "References" },
-	},
-	["["] = {
-		d = { "<cmd>lua vim.diagnostic.goto_prev()<CR>", "Prev diagnostic" },
-	},
-	["]"] = {
-		d = { "<cmd>lua vim.diagnostic.goto_next()<CR>", "Next diagnostic" },
-	},
-}, { buffer = bufnr })
-
-vim.diagnostic.config({
-	virtual_text = true, -- ксте
-	signs = true,     -- Значки на полях
-	update_in_insert = false,
-})
-
 -- Общая функция для keymaps
 local on_attach = function(client, bufnr)
-	-- Опции для буферных keymaps
 	local opts = { buffer = bufnr }
 
-	-- Сначала регистрируем все LSP keymaps
 	-- Навигация
 	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
@@ -121,16 +53,33 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
 end
 
-lsp.gopls.setup({
-	cmd = {
-		-- "ya",
-		-- "tool",
-		"gopls",
-		"-rpc.trace",
-		"-logfile",
-		"/tmp/gopls.log",
-	},
+-- Telescope LSP интеграция
+vim.keymap.set("n", "tgd", function()
+	require("telescope.builtin").lsp_definitions()
+end, { desc = "[T]elescope [G]oto [D]efinition" })
+
+vim.keymap.set("n", "tgr", function()
+	require("telescope.builtin").lsp_references({ jump_type = "never" })
+end, { desc = "[T]elescope [G]oto [R]eferences" })
+
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
+
+vim.diagnostic.config({
+	virtual_text = true,
+	signs = true,
+	update_in_insert = false,
+})
+
+-- Регистрируем LSP серверы через vim.lsp.config
+-- Правильный синтаксис: vim.lsp.config['name'] = config
+
+-- 1. gopls для Go
+vim.lsp.config['gopls'] = {
+	cmd = { "gopls" },
 	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "go" },
+	root_markers = { "go.work", "go.mod", ".git" },
 	settings = {
 		gopls = {
 			directoryFilters = {
@@ -163,17 +112,15 @@ lsp.gopls.setup({
 			},
 		},
 	},
-	root_markers = {
-		"ya.make",
-		"go.work",
-		"go.mod",
-		".git",
-	},
-})
+}
 
-lsp.pylsp.setup({
+-- 2. pylsp для Python
+vim.lsp.config['pylsp'] = {
+	cmd = { "pylsp" },
 	capabilities = capabilities,
 	on_attach = on_attach,
+	filetypes = { "python" },
+	root_markers = { "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", ".git" },
 	settings = {
 		pylsp = {
 			plugins = {
@@ -185,7 +132,7 @@ lsp.pylsp.setup({
 					enabled = true,
 				},
 				autopep8 = {
-					enabled = false, -- если используете black
+					enabled = false,
 				},
 				black = {
 					enabled = true,
@@ -195,11 +142,10 @@ lsp.pylsp.setup({
 			},
 		},
 	},
-})
+}
 
-local clangd_config = {
-	capabilities = capabilities,
-	on_attach = on_attach,
+-- 3. clangd для C/C++
+vim.lsp.config['clangd'] = {
 	cmd = {
 		"clangd",
 		"--background-index",
@@ -208,26 +154,18 @@ local clangd_config = {
 		"--all-scopes-completion",
 		"--cross-file-rename",
 	},
-	filetypes = { "c", "cc", "cpp", "objc", "objcpp", "cuda", "h", "hpp" },
-}
-
-if has_esp32 then
-	clangd_config.on_new_config = function(new_config, root_dir)
-		-- Проверяем, есть ли в проекте sdkconfig (признак ESP-IDF)
-		if root_dir and vim.fn.filereadable(root_dir .. "/sdkconfig") == 1 then
-			-- Используем специальную конфигурацию от esp32.nvim
-			local esp_config = esp32.lsp_config()
-			new_config.cmd = esp_config.cmd
-			new_config.init_options = esp_config.init_options
-		end
-	end
-end
-
-lsp.clangd.setup(clangd_config)
--- LSP сервер для YAML
-lsp.yamlls.setup({
 	capabilities = capabilities,
 	on_attach = on_attach,
+	filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
+	root_markers = { ".clangd", "compile_commands.json", "compile_flags.txt", ".git" },
+}
+-- 4. yamlls для YAML
+vim.lsp.config['yamlls'] = {
+	cmd = { "yaml-language-server", "--stdio" },
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "yaml", "yml" },
+	root_markers = { ".yamllint", ".git" },
 	settings = {
 		yaml = {
 			schemas = {
@@ -236,13 +174,13 @@ lsp.yamlls.setup({
 				["http://json.schemastore.org/github-action"] = ".github/action.yml",
 				["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/*.yml",
 				["http://json.schemastore.org/prettierrc"] = ".prettierrc.yaml",
-				["http://json.schemastore.org/kustomization"] = "kustomizzzaaation.yaml",
+				["http://json.schemastore.org/kustomization"] = "kustomization.yaml",
 				["http://json.schemastore.org/helmfile"] = "helmfile.yaml",
 				["http://json.schemastore.org/chart"] = "Chart.yaml",
 			},
 			schemaStore = {
 				enable = true,
-				url = "https://www.schemastore.org/api/"
+				url = "https://www.schemastore.org/api/",
 			},
 			format = {
 				enable = true,
@@ -252,49 +190,101 @@ lsp.yamlls.setup({
 			hover = true,
 		},
 	},
-	filetypes = { "yaml", "yml" },
-})
+}
 
-local null_ls = require("null-ls")
-
-null_ls.setup({
-	on_attach = on_attach,    -- добавьте эту строку
-	capabilities = capabilities, -- и эту
-	sources = {
-		-- Линтинг
-		null_ls.builtins.diagnostics.eslint,
-		null_ls.builtins.diagnostics.pylint,
-
-		-- Форматирование
-		null_ls.builtins.formatting.prettier,
-		null_ls.builtins.formatting.black, -- для Python
-		null_ls.builtins.formatting.stylua.with({
-			extra_args = {
-				"--verify",
-			}
-		}),
-		-- Действия с кодом
-		null_ls.builtins.code_actions.gitsigns,
-
-		-- C++: форматирование с помощью clang-format
-		null_ls.builtins.formatting.clang_format,
-
-		-- SQL: линтинг и форматирование
-		null_ls.builtins.diagnostics.sqlfluff,
-		null_ls.builtins.formatting.sqlfluff,
-
-		-- Новые для YAML
-		null_ls.builtins.formatting.yamlfmt.with({
-			extra_args = { "--formatter", "yaml" },
-		}),
-		null_ls.builtins.formatting.prettier.with({
-			filetypes = { "yaml", "yml" },
-		}),
-		-- Новые для JSON
-		null_ls.builtins.diagnostics.jsonlint,
-		null_ls.builtins.formatting.jq,
-		null_ls.builtins.formatting.prettier.with({
-			filetypes = { "json", "jsonc" },
-		}),
+-- 5. jsonls для JSON
+vim.lsp.config['jsonls'] = {
+	cmd = { "vscode-json-language-server", "--stdio" },
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "json", "jsonc" },
+	root_markers = { ".jsonlint", ".git" },
+	settings = {
+		json = {
+			format = {
+				enable = true,
+			},
+			validate = { enable = true },
+		},
 	},
-})
+}
+
+-- 6. lua_ls для Lua
+vim.lsp.config['lua_ls'] = {
+	cmd = { "lua-language-server" },
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "lua" },
+	root_markers = { ".luarc.json", ".luarc.jsonc", ".git" },
+	settings = {
+		Lua = {
+			runtime = { version = "LuaJIT" },
+			diagnostics = { globals = { "vim" } },
+			workspace = {
+				library = vim.api.nvim_get_runtime_file("", true),
+				checkThirdParty = false,
+			},
+			telemetry = { enable = false },
+			format = { enable = true },
+		},
+	},
+}
+
+-- 7. bashls для Bash
+vim.lsp.config['bashls'] = {
+	cmd = { "bash-language-server", "start" },
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "sh", "bash" },
+	root_markers = { ".bashrc", ".bash_profile", ".git" },
+}
+
+-- 8. dockerls для Docker
+vim.lsp.config['dockerls'] = {
+	cmd = { "docker-langserver", "--stdio" },
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "dockerfile" },
+	root_markers = { "Dockerfile", ".dockerignore", ".git" },
+}
+
+-- 9. sqls для SQL
+vim.lsp.config['sqls'] = {
+	cmd = { "sqls" },
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "sql" },
+	root_markers = { ".sqls.yml", ".git" },
+}
+
+-- Включаем LSP серверы
+vim.lsp.enable('gopls')
+vim.lsp.enable('pylsp')
+vim.lsp.enable('clangd')
+vim.lsp.enable('yamlls')
+vim.lsp.enable('jsonls')
+vim.lsp.enable('lua_ls')
+vim.lsp.enable('bashls')
+vim.lsp.enable('dockerls')
+vim.lsp.enable('sqls')
+
+-- Проверка статуса LSP
+vim.api.nvim_create_user_command('LspStatus', function()
+	local clients = vim.lsp.get_clients()
+	if #clients == 0 then
+		print("No active LSP clients")
+	else
+		print("Active LSP clients:")
+		for _, client in ipairs(clients) do
+			local pid_info = client.pid and tostring(client.pid) or "unknown"
+			print(string.format("  - %s (pid: %s)", client.name, pid_info))
+		end
+	end
+end, { desc = "Show active LSP clients" })
+
+-- Дополнительная команда для отладки
+vim.api.nvim_create_user_command('LspLog', function()
+	vim.cmd('checkhealth vim.lsp')
+	local log_path = vim.lsp.get_log_path()
+	print("LSP log file: " .. log_path)
+end, { desc = "Show LSP log path" })

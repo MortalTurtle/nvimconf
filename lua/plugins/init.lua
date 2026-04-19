@@ -17,6 +17,7 @@ require("lazy").setup({
 		"williamboman/mason.nvim",
 		config = function()
 			require("mason").setup({
+				PATH = "append",
 				ui = {
 					icons = {
 						package_installed = "✓",
@@ -31,11 +32,12 @@ require("lazy").setup({
 		"ojroques/nvim-osc52",
 		config = function()
 			require("osc52").setup({
-				silent = false, -- Не показывать подтверждение копирования
-				trim = true, -- Обрезать пробелы в начале/конце
+				silent = false,
+				trim = true,
 			})
 		end,
 	},
+	-- Mason интеграция с LSP (все еще нужна для установки серверов)
 	{
 		"williamboman/mason-lspconfig.nvim",
 		dependencies = { "williamboman/mason.nvim" },
@@ -50,8 +52,10 @@ require("lazy").setup({
 					"jsonls",
 					"bashls",
 					"dockerls",
+					"lua_ls",
 				},
 				automatic_installation = true,
+				handlers = {},
 			})
 		end,
 	},
@@ -68,59 +72,20 @@ require("lazy").setup({
 			})
 		end,
 	},
-	{
-		"jay-babu/mason-null-ls.nvim",
-		dependencies = {
-			"williamboman/mason.nvim",
-			"nvimtools/none-ls.nvim",
-		},
-		config = function()
-			require("mason-null-ls").setup({
-				ensure_installed = {
-					"prettier",
-					"stylua",
-					"black",
-					"pylint",
-					"eslint_d",
-					"sqlfluff",
-					"clang-format",
-					"cppcheck",
-					"yamllint",
-					"yamlfmt",
-					"jsonlint",
-					"jq",
-				},
-				automatic_installation = true,
-			})
-		end,
-	},
-	{
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				ensure_installed = { "lua", "python", "json", "bash", "cpp", "c", "go", "java" },
-				highlight = {
-					enable = true,
-					additional_vim_regex_highlighting = false,
-				},
-			})
-		end,
-	},
+	-- SchemaStore для JSON схем
 	{
 		"b0o/SchemaStore.nvim",
 		lazy = true,
 	},
-	-- Search - ДОБАВЛЕН Telescope И ЕГО ЗАВИСИМОСТИ
+	-- Search
 	{
 		"nvim-telescope/telescope.nvim",
 		tag = "0.1.5",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-			"nvim-treesitter/nvim-treesitter",
 		}
 	},
-	-- LSP completion - ДОБАВЛЕН cmp_nvim_lsp
+	-- LSP completion
 	{
 		"hrsh7th/cmp-nvim-lsp",
 		dependencies = "hrsh7th/nvim-cmp"
@@ -133,7 +98,7 @@ require("lazy").setup({
 			require("lualine").setup({
 				sections = {
 					lualine_c = {
-						{ "filename", path = 1 }, -- 1 = относительный путь, 2 = абсолютный, 3 = только имя
+						{ "filename", path = 1 },
 					},
 					lualine_x = { "encoding", "filetype" },
 				},
@@ -176,11 +141,7 @@ require("lazy").setup({
 	{
 		"folke/which-key.nvim",
 		event = "VeryLazy",
-		opts = {
-			-- your configuration comes here
-			-- or leave it empty to use the default settings
-			-- refer to the configuration section below
-		},
+		opts = {},
 		keys = {
 			{
 				"<leader>?",
@@ -210,18 +171,18 @@ require("lazy").setup({
 			require("dap-go").setup()
 		end,
 	},
-	--lsp
+	--lsp utils
 	{
 		"echasnovski/mini.nvim",
 		config = function()
 			require("mini.trailspace").setup()
-			require("mini.misc").setup() -- включает автоформатирование EOF
+			require("mini.misc").setup()
 			require("mini.comment").setup()
 			require("mini.surround").setup({
 				mappings = {
-					add = "gsa", -- Добавить окружение (в визуальном режиме)
-					delete = "gsd", -- Удалить окружение
-					replace = "gsr", -- Заменить окружение
+					add = "gsa",
+					delete = "gsd",
+					replace = "gsr",
 				},
 			})
 		end,
@@ -230,12 +191,15 @@ require("lazy").setup({
 		"Aietes/esp32.nvim",
 		lazy = false,
 		config = function()
-        require("esp32").setup({
-            build_dir = "build.clang",
-        })
-    	end,
+			require("esp32").setup({
+				build_dir = "build.clang",
+			})
+		end,
 	},
-	{ "neovim/nvim-lspconfig" },
+	-- NOTE: nvim-lspconfig больше не нужен! Используем нативный vim.lsp
+	-- {
+	--   "neovim/nvim-lspconfig",  -- Удаляем!
+	-- },
 	{
 		"L3MON4D3/LuaSnip",
 		version = "v2.*",
@@ -251,13 +215,12 @@ require("lazy").setup({
 			"hrsh7th/cmp-nvim-lua",
 			"hrsh7th/cmp-calc",
 			"hrsh7th/cmp-emoji",
-			"ray-x/cmp-treesitter",
-			"hrsh7th/cmp-nvim-lsp", -- LSP-источник
-			"hrsh7th/cmp-buffer", -- Дополнение из буфера
-			"hrsh7th/cmp-path", -- Дополнение путей
-			"hrsh7th/cmp-cmdline", -- Дополнение команд
-			"L3MON4D3/LuaSnip", -- Snippets-движок
-			"saadparwaiz1/cmp_luasnip", -- Интеграция LuaSnip с cmp
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-cmdline",
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
 		},
 		config = function()
 			local cmp = require("cmp")
@@ -298,24 +261,14 @@ require("lazy").setup({
 					{ name = "luasnip" },
 					{ name = "buffer" },
 					{ name = "path" },
-					{ name = "nvim_lua" }, -- Для Lua API Neovim
-					{ name = "calc" },   -- Математические вычисления
-					{ name = "emoji" },  -- Подсказки emoji
-					{ name = "treesitter" }, -- Использование treesitter
-					{ name = "vim-dadbod-completion" }, -- Для SQL
+					{ name = "nvim_lua" },
+					{ name = "calc" },
+					{ name = "emoji" },
 				}),
 				experimental = {
-					ghost_text = true, -- Показывать подсказку прямо в тексте
+					ghost_text = true,
 				},
 			})
-		end,
-	},
-	{
-		"nvimtools/none-ls.nvim",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-		},
-		config = function()
 		end,
 	},
 	--colorthemes
@@ -334,7 +287,6 @@ require("lazy").setup({
 			require("onedark").setup({
 				style = "warmer",
 			})
-			-- Enable theme
 			require("onedark").load()
 		end,
 	},
@@ -354,7 +306,7 @@ require("nvim-tree").setup({
 		group_empty = true,
 	},
 	git = {
-		enable = true, -- подсветка изменений Git
+		enable = true,
 		ignore = false,
 	},
 	hijack_cursor = false,
@@ -365,7 +317,6 @@ vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { desc = "Toggle file tree" 
 vim.keymap.set("n", "<C-r", ":NvimTreeRefresh<CR>", { desc = "Refresh file tree" })
 vim.keymap.set("n", "<C-f>", ":NvimTreeFindFile<CR>", { desc = "Find current file in tree" })
 
---Автоматическое закрытие Neovim, если осталось только дерево:
 vim.api.nvim_create_autocmd("BufEnter", {
 	nested = true,
 	callback = function()
@@ -379,29 +330,29 @@ require("plugins.lsp")
 require("plugins.dap")
 require("bufferline").setup({
 	options = {
-		mode = "buffers", -- или "tabs" (режим вкладок вместо буферов)
-		numbers = "none", -- "none" | "ordinal" | "buffer_id" | "both"
-		close_command = "bdelete! %d", -- команда для закрытия буфера
-		right_mouse_command = "bdelete! %d", -- действие по ПКМ
-		left_mouse_command = "buffer %d", -- действие по ЛКМ
-		middle_mouse_command = nil, -- действие по СКМ
+		mode = "buffers",
+		numbers = "none",
+		close_command = "bdelete! %d",
+		right_mouse_command = "bdelete! %d",
+		left_mouse_command = "buffer %d",
+		middle_mouse_command = nil,
 		indicator = {
-			icon = "▎", -- индикатор текущего буфера
-			style = "underline", -- или "icon" | "none"
+			icon = "▎",
+			style = "underline",
 		},
-		modified_icon = "●", -- иконка изменённого буфера
-		left_trunc_marker = "", -- маркер обрезанного списка слева
-		right_trunc_marker = "", -- маркер обрезанного списка справа
-		name_formatter = function(buf) -- форматирование имени буфера
+		modified_icon = "●",
+		left_trunc_marker = "",
+		right_trunc_marker = "",
+		name_formatter = function(buf)
 			return buf.name
 		end,
-		max_name_length = 18,           -- макс. длина имени буфера
-		max_prefix_length = 15,         -- макс. длина префикса (для уникальных имён)
-		truncate_names = true,          -- обрезать длинные имена
-		tab_size = 18,                  -- ширина вкладки
-		diagnostics = "nvim_lsp",       -- источник диагностики ("nvim_lsp" | "coc")
-		diagnostics_update_in_insert = false, -- обновлять диагностику в режиме вставки
-		offsets = {                     -- смещения для других элементов (например, NvimTree)
+		max_name_length = 18,
+		max_prefix_length = 15,
+		truncate_names = true,
+		tab_size = 18,
+		diagnostics = "nvim_lsp",
+		diagnostics_update_in_insert = false,
+		offsets = {
 			{
 				filetype = "NvimTree",
 				text = "File Explorer",
@@ -409,15 +360,15 @@ require("bufferline").setup({
 				text_align = "left",
 			},
 		},
-		color_icons = true,       -- раскрашивать иконки
-		show_buffer_icons = true, -- показывать иконки буферов
-		show_buffer_close_icons = true, -- показывать иконки закрытия
-		show_close_icon = true,   -- показывать иконку закрытия всей панели
-		show_tab_indicators = true, -- показывать индикаторы вкладок
-		persist_buffer_sort = true, -- сохранять сортировку буферов
-		separator_style = "thick", -- "slant" | "slope" | "thick" | "thin" | { "any", "any" }
-		enforce_regular_tabs = false, -- выравнивать вкладки по размеру
-		always_show_bufferline = true, -- всегда показывать bufferline
+		color_icons = true,
+		show_buffer_icons = true,
+		show_buffer_close_icons = true,
+		show_close_icon = true,
+		show_tab_indicators = true,
+		persist_buffer_sort = true,
+		separator_style = "thick",
+		enforce_regular_tabs = false,
+		always_show_bufferline = true,
 	},
 })
 vim.keymap.set("n", "<Tab>", "<Cmd>BufferLineCycleNext<CR>", { desc = "Следующий буфер" })
@@ -437,7 +388,6 @@ vim.keymap.set(
 	{ desc = "Закрыть буферы справа" }
 )
 
--- Переключение цветовых схем
 vim.keymap.set('n', '<leader>ct', function()
 	local current_theme = vim.g.colors_name
 	if current_theme == "onedark" then

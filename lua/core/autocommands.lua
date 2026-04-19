@@ -9,7 +9,7 @@ local autocmd = vim.api.nvim_create_autocmd
 
 -- Автоформатирование перед сохранением (если LSP поддерживает)
 autocmd('BufWritePre', {
-  pattern = '*.lua,*.py,*.js,*.go,*.cc,*.cpp,*.hpp,*.h',
+  pattern = '*.lua,*.py,*.js,*.go,*.cc,*c,*.cpp,*.hpp,*.h',
   callback = function()
     vim.lsp.buf.format()
   end,
