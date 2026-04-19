@@ -1,6 +1,6 @@
 -- ~/.config/nvim/lua/plugins/lsp.lua
 local lsp = require("lspconfig")
-
+local has_esp32, esp32 = pcall(require, "esp32")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 capabilities.textDocument.completion.completionItem = {
@@ -81,7 +81,7 @@ require("which-key").register({
 }, { buffer = bufnr })
 
 vim.diagnostic.config({
-	virtual_text = true, -- Показыи в тексте
+	virtual_text = true, -- ксте
 	signs = true,     -- Значки на полях
 	update_in_insert = false,
 })
@@ -128,7 +128,7 @@ lsp.gopls.setup({
 		"gopls",
 		"-rpc.trace",
 		"-logfile",
-		"/home/mortalturtle/.local/state/nvim/gopls.log",
+		"/tmp/gopls.log",
 	},
 	capabilities = capabilities,
 	settings = {
@@ -197,20 +197,33 @@ lsp.pylsp.setup({
 	},
 })
 
-lsp.clangd.setup({
+local clangd_config = {
 	capabilities = capabilities,
-	on_attach = on_attach, -- убедимся, что используем общую on_attach
+	on_attach = on_attach,
 	cmd = {
 		"clangd",
 		"--background-index",
 		"--clang-tidy",
-		"--completion-style=detailed", -- более детальное автодополнение
+		"--completion-style=detailed",
 		"--all-scopes-completion",
 		"--cross-file-rename",
 	},
 	filetypes = { "c", "cc", "cpp", "objc", "objcpp", "cuda", "h", "hpp" },
-})
+}
 
+if has_esp32 then
+	clangd_config.on_new_config = function(new_config, root_dir)
+		-- Проверяем, есть ли в проекте sdkconfig (признак ESP-IDF)
+		if root_dir and vim.fn.filereadable(root_dir .. "/sdkconfig") == 1 then
+			-- Используем специальную конфигурацию от esp32.nvim
+			local esp_config = esp32.lsp_config()
+			new_config.cmd = esp_config.cmd
+			new_config.init_options = esp_config.init_options
+		end
+	end
+end
+
+lsp.clangd.setup(clangd_config)
 -- LSP сервер для YAML
 lsp.yamlls.setup({
 	capabilities = capabilities,
@@ -223,13 +236,14 @@ lsp.yamlls.setup({
 				["http://json.schemastore.org/github-action"] = ".github/action.yml",
 				["http://json.schemastore.org/ansible-stable-2.9"] = "roles/tasks/*.yml",
 				["http://json.schemastore.org/prettierrc"] = ".prettierrc.yaml",
-				["http://json.schemastore.org/kustomization"] = "kustomization.yaml",
+				["http://json.schemastore.org/kustomization"] = "kustomizzzaaation.yaml",
 				["http://json.schemastore.org/helmfile"] = "helmfile.yaml",
 				["http://json.schemastore.org/chart"] = "Chart.yaml",
 			},
 			schemaStore = {
 				enable = true,
-				url = "https://www.schemastore.org/api/json/catalog", },
+				url = "https://www.schemastore.org/api/"
+			},
 			format = {
 				enable = true,
 			},
@@ -253,9 +267,12 @@ null_ls.setup({
 
 		-- Форматирование
 		null_ls.builtins.formatting.prettier,
-		null_ls.builtins.formatting.stylua, -- для Lua
 		null_ls.builtins.formatting.black, -- для Python
-
+		null_ls.builtins.formatting.stylua.with({
+			extra_args = {
+				"--verify",
+			}
+		}),
 		-- Действия с кодом
 		null_ls.builtins.code_actions.gitsigns,
 

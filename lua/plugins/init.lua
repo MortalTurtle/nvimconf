@@ -28,12 +28,20 @@ require("lazy").setup({
 		end,
 	},
 	{
+		"ojroques/nvim-osc52",
+		config = function()
+			require("osc52").setup({
+				silent = false, -- Не показывать подтверждение копирования
+				trim = true, -- Обрезать пробелы в начале/конце
+			})
+		end,
+	},
+	{
 		"williamboman/mason-lspconfig.nvim",
 		dependencies = { "williamboman/mason.nvim" },
 		config = function()
 			require("mason-lspconfig").setup({
 				ensure_installed = {
-					"lua_ls",
 					"pylsp",
 					"gopls",
 					"clangd",
@@ -146,16 +154,6 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"ojroques/nvim-osc52",
-		config = function()
-			require("osc52").setup({
-				-- Опциональные настройки:
-				silent = false, -- Не показывать подтверждение копирования
-				trim = true, -- Обрезать пробелы в начале/конце
-			})
-		end,
-	},
-	{
 		"nvim-tree/nvim-web-devicons",
 		lazy = true,
 		config = function()
@@ -227,6 +225,15 @@ require("lazy").setup({
 				},
 			})
 		end,
+	},
+	{
+		"Aietes/esp32.nvim",
+		lazy = false,
+		config = function()
+        require("esp32").setup({
+            build_dir = "build.clang",
+        })
+    	end,
 	},
 	{ "neovim/nvim-lspconfig" },
 	{
@@ -322,7 +329,7 @@ require("lazy").setup({
 	},
 	{
 		"navarasu/onedark.nvim",
-		priority = 1000, -- make sure to load this before all the other start plugins
+		priority = 1000,
 		config = function()
 			require("onedark").setup({
 				style = "warmer",
@@ -430,6 +437,17 @@ vim.keymap.set(
 	{ desc = "Закрыть буферы справа" }
 )
 
-vim.keymap.set("n", "<leader>y", require("osc52").copy_operator, { expr = true })
-vim.keymap.set("n", "<leader>yy", "<leader>y_", { remap = true })
-vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
+-- Переключение цветовых схем
+vim.keymap.set('n', '<leader>ct', function()
+	local current_theme = vim.g.colors_name
+	if current_theme == "onedark" then
+		vim.cmd("colorscheme github_dark")
+	else
+		vim.cmd("colorscheme onedark")
+	end
+	vim.notify("Colorscheme: " .. vim.g.colors_name)
+end, { desc = "Toggle color scheme" })
+
+vim.keymap.set("n", "<leader>oy", require("osc52").copy_operator, { expr = true })
+vim.keymap.set("n", "<leader>oyy", "<leader>y_", { remap = true })
+vim.keymap.set("v", "<leader>oy", require("osc52").copy_visual)

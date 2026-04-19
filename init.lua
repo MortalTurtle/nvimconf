@@ -3,4 +3,3 @@ require('core.keymaps')
 require('core.autocommands')
 require('plugins.init')
 require('colorscheme')
-

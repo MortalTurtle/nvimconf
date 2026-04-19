@@ -24,3 +24,29 @@ vim.keymap.set({ 'n' }, '<C-l>', '<C-w>l')
 
 vim.keymap.set('v', '<Tab>', '>gv', { desc = 'Indent selection' })
 vim.keymap.set('v', '<S-Tab>', '<gv', { desc = 'Unindent selection' })
+vim.keymap.set({ 'n', 'v' }, '<leader>y', '"+y', {
+    desc = 'Копировать в системный буфер'
+})
+vim.keymap.set('n', '<leader>yy', '"+yy', {
+    desc = 'Копировать строку в системный буфер'
+})
+vim.keymap.set('n', '<leader>y$', '"+y$', {
+    desc = 'Копировать до конца строки в системный буфер'
+})
+vim.keymap.set('n', '<leader>y^', '"+y^', {
+    desc = 'Копировать от начала строки в системный буфер'
+})
+-- Удаление в системный буфер
+vim.keymap.set({ 'n', 'v' }, '<leader>d', '"+d', {
+    desc = 'Удалить в системный буфер'
+})
+vim.keymap.set('n', '<leader>dd', '"+dd', {
+    desc = 'Удалить строку в системный буфер'
+})
+-- Вставка из системного буфера
+vim.keymap.set({ 'n', 'v' }, '<leader>p', '"+p', {
+    desc = 'Вставить из системного буфера'
+})
+vim.keymap.set({ 'n', 'v' }, '<leader>P', '"+P', {
+    desc = 'Вставить из системного буфера перед курсором'
+})
