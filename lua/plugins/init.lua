@@ -389,13 +389,18 @@ vim.keymap.set(
 )
 
 vim.keymap.set('n', '<leader>ct', function()
-	local current_theme = vim.g.colors_name
-	if current_theme == "onedark" then
-		vim.cmd("colorscheme github_dark")
+	if _G.toggle_colorscheme then
+		_G.toggle_colorscheme()
 	else
-		vim.cmd("colorscheme onedark")
+		-- Fallback если функция не загружена
+		local current_theme = vim.g.colors_name
+		if current_theme == "onedark" then
+			vim.cmd("colorscheme github_dark")
+		else
+			vim.cmd("colorscheme onedark")
+		end
+		vim.notify("Colorscheme: " .. vim.g.colors_name)
 	end
-	vim.notify("Colorscheme: " .. vim.g.colors_name)
 end, { desc = "Toggle color scheme" })
 
 vim.keymap.set("n", "<leader>oy", require("osc52").copy_operator, { expr = true })
