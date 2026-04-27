@@ -302,6 +302,17 @@ local function setup_syntax_highlighting()
     vim.api.nvim_set_hl(0, 'DiffChange', { link = '@text.diff.change' })
     vim.api.nvim_set_hl(0, 'DiffText', { fg = colors.yellow, bg = colors.diff_text_bg })
 
+    -- GitSigns подсветка (в стиле VSCode)
+    vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = '#73c991', bg = 'NONE' }) -- зеленый
+    vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = '#e2c08d', bg = 'NONE' }) -- желтый
+    vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = '#f3676f', bg = 'NONE' }) -- красный
+    vim.api.nvim_set_hl(0, 'GitSignsAddNr', { fg = '#73c991', bg = 'NONE' }) -- номер строки
+    vim.api.nvim_set_hl(0, 'GitSignsChangeNr', { fg = '#e2c08d', bg = 'NONE' })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteNr', { fg = '#f3676f', bg = 'NONE' })
+    vim.api.nvim_set_hl(0, 'GitSignsAddLn', { bg = '#1a3a2a' }) -- фон строки
+    vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { bg = '#3a3a1a' })
+    vim.api.nvim_set_hl(0, 'GitSignsDeleteLn', { bg = '#3a1a1a' })
+
     -- ============================================================
     -- 11. СПЕЦИАЛЬНЫЕ СЛУЧАИ
     -- ============================================================

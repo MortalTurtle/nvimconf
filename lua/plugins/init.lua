@@ -196,10 +196,31 @@ require("lazy").setup({
 			})
 		end,
 	},
-	-- NOTE: nvim-lspconfig больше не нужен! Используем нативный vim.lsp
-	-- {
-	--   "neovim/nvim-lspconfig",  -- Удаляем!
-	-- },
+	-- Git signs в стиле VSCode
+	{
+		"lewis6991/gitsigns.nvim",
+		event = "BufReadPre",
+		config = function()
+			require("gitsigns").setup({
+				signs                   = {
+					add          = { text = "▎" },
+					change       = { text = "▎" },
+					delete       = { text = "▎" },
+					topdelete    = { text = "▎" },
+					changedelete = { text = "▎" },
+				},
+				signcolumn              = true,
+				numhl                   = true,
+				linehl                  = false,
+				current_line_blame      = true,
+				current_line_blame_opts = {
+					virt_text = true,
+					virt_text_pos = "eol",
+					delay = 500,
+				},
+			})
+		end,
+	},
 	{
 		"L3MON4D3/LuaSnip",
 		version = "v2.*",
