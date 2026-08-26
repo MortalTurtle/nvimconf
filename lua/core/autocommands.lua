@@ -7,13 +7,6 @@ local autocmd = vim.api.nvim_create_autocmd
 --   end,
 -- })
 
--- Автоформатирование перед сохранением (если LSP поддерживает)
-autocmd('BufWritePre', {
-  pattern = '*.lua,*.py,*.js,*.go,*.cc,*c,*.cpp,*.hpp,*.h',
-  callback = function()
-    vim.lsp.buf.format()
-  end,
-})
 
 -- Авторелоад конфига Neovim
 autocmd('BufWritePost', {
