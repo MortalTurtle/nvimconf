@@ -236,15 +236,6 @@ require("lazy").setup({
             })
         end,
     },
-    {
-        "Aietes/esp32.nvim",
-        lazy = false,
-        config = function()
-            require("esp32").setup({
-                build_dir = "build.clang",
-            })
-        end,
-    },
     -- Git signs в стиле VSCode
     {
         "lewis6991/gitsigns.nvim",
